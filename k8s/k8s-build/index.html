@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ubuntu18,kubernetes,k8s,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="K8s安装本地测试环境 服务器环境     节点 系统 IP    k8s-master ubuntu18.04 10.10.2.10   k8s-node-01 ubuntu18.04 10.10.2.11   k8s-node-02 ubuntu18.04 10.10.2.12   ntfs ubuntu18.04 10.10.2.21     安装docker  1234$ sudo apt">
+<meta name="keywords" content="ubuntu18,kubernetes,k8s">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ubuntu18 搭建k8s测试环境">
+<meta property="og:url" content="http://yoursite.com/k8s/k8s-build/index.html">
+<meta property="og:site_name" content="太年轻">
+<meta property="og:description" content="K8s安装本地测试环境 服务器环境     节点 系统 IP    k8s-master ubuntu18.04 10.10.2.10   k8s-node-01 ubuntu18.04 10.10.2.11   k8s-node-02 ubuntu18.04 10.10.2.12   ntfs ubuntu18.04 10.10.2.21     安装docker  1234$ sudo apt">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-06-28T06:02:12.740Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ubuntu18 搭建k8s测试环境">
+<meta name="twitter:description" content="K8s安装本地测试环境 服务器环境     节点 系统 IP    k8s-master ubuntu18.04 10.10.2.10   k8s-node-01 ubuntu18.04 10.10.2.11   k8s-node-02 ubuntu18.04 10.10.2.12   ntfs ubuntu18.04 10.10.2.21     安装docker  1234$ sudo apt">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/k8s/k8s-build/">
+
+
+
+
+
+  <title>Ubuntu18 搭建k8s测试环境 | 太年轻</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">太年轻</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/k8s/k8s-build/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Easeava">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="太年轻">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Ubuntu18 搭建k8s测试环境</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-28T13:42:33+08:00">
+                2019-04-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/运维笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">运维笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="K8s安装本地测试环境"><a href="#K8s安装本地测试环境" class="headerlink" title="K8s安装本地测试环境"></a>K8s安装本地测试环境</h1><blockquote>
+<p>服务器环境</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>节点</th>
+<th>系统</th>
+<th>IP</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>k8s-master</td>
+<td>ubuntu18.04</td>
+<td>10.10.2.10</td>
+</tr>
+<tr>
+<td>k8s-node-01</td>
+<td>ubuntu18.04</td>
+<td>10.10.2.11</td>
+</tr>
+<tr>
+<td>k8s-node-02</td>
+<td>ubuntu18.04</td>
+<td>10.10.2.12</td>
+</tr>
+<tr>
+<td>ntfs</td>
+<td>ubuntu18.04</td>
+<td>10.10.2.21</td>
+</tr>
+</tbody></table>
+<hr>
+<blockquote>
+<p>安装docker</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt install docker.io</span><br><span class="line">$ systemctl damon-reload</span><br><span class="line">$ systemctl start docker</span><br><span class="line">$ systemctl enable docker</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><input checked disabled type="checkbox"> 非管理员用户需要加入docker分组</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">oni@k8s-master:~$ sudo gpasswd -a $USER docker</span><br><span class="line">Adding user oni to group docker</span><br><span class="line">oni@k8s-master:~$ newgrp docker</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>kubeadm, kubelet 和 kubectl</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># 首先需要关闭系统swap</span><br><span class="line">$ sudo swapoff -a // 重启会失效</span><br><span class="line"># 注释或者删掉swap 永久关闭</span><br><span class="line">$ sudo vim /etc/fstab</span><br><span class="line"></span><br><span class="line">$ sudo apt install -y apt-transport-https curl</span><br><span class="line">$ curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -</span><br><span class="line">$ sudo su</span><br><span class="line">$ cat &lt;&lt;EOF &gt;/etc/apt/sources.list.d/kubernetes.list</span><br><span class="line">deb https://apt.kubernetes.io/ kubernetes-xenial main</span><br><span class="line">EOF</span><br><span class="line">$ apt update</span><br><span class="line">$ apt install -y kubelet kubeadm kubectl</span><br><span class="line">$ apt-mark hold kubelet kubeadm kubectl</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>k8s-master</p>
+</blockquote>
+<h6 id="k8s镜像因为墙的原因拉取不到-可以自己搭建镜像服务器或者使用第三方国内源"><a href="#k8s镜像因为墙的原因拉取不到-可以自己搭建镜像服务器或者使用第三方国内源" class="headerlink" title="k8s镜像因为墙的原因拉取不到, 可以自己搭建镜像服务器或者使用第三方国内源"></a>k8s镜像因为墙的原因拉取不到, 可以自己搭建镜像服务器或者使用第三方国内源</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># 这里是测试环境镜像使用第三方镜像</span><br><span class="line">#!/bin/bash</span><br><span class="line"></span><br><span class="line">images=(kube-apiserver:v1.14.1 kube-controller-manager:v1.14.1 kube-scheduler:v1.14.1 kube-proxy:v1.14.1 pause:3.1 etcd:3.3.10)</span><br><span class="line"></span><br><span class="line">for image in $&#123;images[@]&#125; ; do</span><br><span class="line">  docker pull mirrorgooglecontainers/$image  </span><br><span class="line">  docker tag mirrorgooglecontainers/$image k8s.gcr.io/$image  </span><br><span class="line">  docker rmi mirrorgooglecontainers/$image</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">docker pull coredns/coredns:1.3.1</span><br><span class="line">docker tag coredns/coredns:1.3.1  k8s.gcr.io/coredns:1.3.1</span><br><span class="line">docker rmi coredns/coredns:1.3.1</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"># 初始化安装</span><br><span class="line">oni@k8s-master:~$ sudo kubeadm init --pod-network-cidr=172.168.10.0/24</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Your Kubernetes control-plane has initialized successfully!</span><br><span class="line"></span><br><span class="line">To start using your cluster, you need to run the following as a regular user:</span><br><span class="line"></span><br><span class="line">  mkdir -p $HOME/.kube</span><br><span class="line">  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config</span><br><span class="line">  sudo chown $(id -u):$(id -g) $HOME/.kube/config</span><br><span class="line"></span><br><span class="line">You should now deploy a pod network to the cluster.</span><br><span class="line">Run &quot;kubectl apply -f [podnetwork].yaml&quot; with one of the options listed at:</span><br><span class="line">  https://kubernetes.io/docs/concepts/cluster-administration/addons/</span><br><span class="line"></span><br><span class="line">Then you can join any number of worker nodes by running the following on each as root:</span><br><span class="line"></span><br><span class="line">kubeadm join 10.10.2.10:6443 --token vf9okh.uwp98yrdzxowa980 \</span><br><span class="line">    --discovery-token-ca-cert-hash sha256:2d4da35dc030056d7a02d9634d74477d8c20698dab6b20e22fe0c7fec4298f33</span><br></pre></td></tr></table></figure>
+
+<p><small>创建提示的kube配置</small></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p $HOME/.kube</span><br><span class="line">sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config</span><br><span class="line">sudo chown $(id -u):$(id -g) $HOME/.kube/config</span><br></pre></td></tr></table></figure>
+
+<p><small>记录<code>kubeadm join 10.10.2.10:6443 --token vf9okh.uwp98yrdzxowa980 --discovery-token-ca-cert-hash sha256:2d4da35dc030056d7a02d9634d74477d8c20698dab6b20e22fe0c7fec4298f33</code> 用于Cluster节点连接master</small></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">oni@k8s-master:~/yaml/install$ kubectl get node</span><br><span class="line">NAME         STATUS     ROLES    AGE   VERSION</span><br><span class="line">k8s-master   NotReady   master   10m   v1.14.1</span><br></pre></td></tr></table></figure>
+
+<p><small>master节点<code>NotReady</code>是因为还没有部署pod</small></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 安装flannel</span><br><span class="line">k8s-master:~$ sudo kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml</span><br><span class="line">podsecuritypolicy.extensions/psp.flannel.unprivileged created</span><br><span class="line">clusterrole.rbac.authorization.k8s.io/flannel created</span><br><span class="line">clusterrolebinding.rbac.authorization.k8s.io/flannel created</span><br><span class="line">serviceaccount/flannel created</span><br><span class="line">configmap/kube-flannel-cfg created</span><br><span class="line">daemonset.extensions/kube-flannel-ds-amd64 created</span><br><span class="line">daemonset.extensions/kube-flannel-ds-arm64 created</span><br><span class="line">daemonset.extensions/kube-flannel-ds-arm created</span><br><span class="line">daemonset.extensions/kube-flannel-ds-ppc64le created</span><br><span class="line">daemonset.extensions/kube-flannel-ds-s390x created</span><br></pre></td></tr></table></figure>
+
+<p><small>==注意==：<code>oni@k8s-master:~$ sudo kubeadm init --pod-network-cidr=172.168.10.0/24</code>–pod-network-cidr设置的IP需要与flannel一致</small></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># flannel安装完成 </span><br><span class="line">oni@k8s-master:~$ kubectl get pods -n kube-system </span><br><span class="line">NAME                                 READY   STATUS    RESTARTS   AGE</span><br><span class="line">coredns-fb8b8dccf-64vhd              1/1     Running   0          40m</span><br><span class="line">coredns-fb8b8dccf-94tll              1/1     Running   0          40m</span><br><span class="line">etcd-k8s-master                      1/1     Running   1          40m</span><br><span class="line">kube-apiserver-k8s-master            1/1     Running   1          39m</span><br><span class="line">kube-controller-manager-k8s-master   1/1     Running   1          40m</span><br><span class="line">kube-flannel-ds-amd64-wkvcq          1/1     Running   0          27m</span><br><span class="line">kube-proxy-znkfb                     1/1     Running   1          40m</span><br><span class="line">kube-scheduler-k8s-master            1/1     Running   1          40m</span><br><span class="line">oni@k8s-master:~$ kubectl get node                                </span><br><span class="line">NAME         STATUS   ROLES    AGE   VERSION</span><br><span class="line">k8s-master   Ready    master   41m   v1.14.1</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>设置ipvs</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">oni@k8s-master:~$ kubectl edit configmaps kube-proxy -n kube-system</span><br><span class="line"></span><br><span class="line">apiVersion: v1</span><br><span class="line">data:</span><br><span class="line">  config.conf: |-</span><br><span class="line">   ...</span><br><span class="line">    ipvs:</span><br><span class="line">      excludeCIDRs: null</span><br><span class="line">      minSyncPeriod: 0s</span><br><span class="line">      scheduler: &quot;&quot;</span><br><span class="line">      syncPeriod: 30s</span><br><span class="line">    kind: KubeProxyConfiguration</span><br><span class="line">    metricsBindAddress: 127.0.0.1:10249</span><br><span class="line">    mode: &quot;ipvs&quot; # 设置mode为ipvs</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 查看ipvs设置是否成功 Using ipvs Proxier</span><br><span class="line">oni@k8s-master:~$ kubectl logs kube-proxy-znkfb -n kube-system      </span><br><span class="line">W0428 09:18:02.244497       1 node.go:113] Failed to retrieve node info: Get https://10.10.2.10:6443/api/v1/nodes/k8s-master: dial tcp 10.10.2.10:6443: connect: connection refused</span><br><span class="line">I0428 09:18:02.244591       1 server_others.go:177] Using ipvs Proxier.</span><br><span class="line">W0428 09:18:02.245157       1 proxier.go:366] invalid nodeIP, initializing kube-proxy with 127.0.0.1 as nodeIP</span><br><span class="line">W0428 09:18:02.245173       1 proxier.go:381] IPVS scheduler not specified, use rr by default</span><br><span class="line">I0428 09:18:02.245352       1 server.go:555] Version: v1.14.1</span><br><span class="line">I0428 09:18:02.257368       1 conntrack.go:52] Setting nf_conntrack_max to 131072</span><br><span class="line">I0428 09:18:02.258516       1 config.go:102] Starting endpoints config controller</span><br><span class="line">I0428 09:18:02.258542       1 controller_utils.go:1027] Waiting for caches to sync for endpoints config controller</span><br><span class="line">I0428 09:18:02.258576       1 config.go:202] Starting service config controller</span><br><span class="line">I0428 09:18:02.258589       1 controller_utils.go:1027] Waiting for caches to sync for service config controller</span><br></pre></td></tr></table></figure>
+
+<p><small>安装ipvsadm管理 <code>apt install ipvsadm</code> 查看路由<code>ipvsadm -n</code></small></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">oni@k8s-master:~$ sudo ipvsadm -ln</span><br><span class="line">IP Virtual Server version 1.2.1 (size=4096)</span><br><span class="line">Prot LocalAddress:Port Scheduler Flags</span><br><span class="line">  -&gt; RemoteAddress:Port           Forward Weight ActiveConn InActConn</span><br><span class="line">TCP  10.96.0.1:443 rr</span><br><span class="line">  -&gt; 10.10.2.10:6443              Masq    1      2          0         </span><br><span class="line">TCP  10.96.0.10:53 rr</span><br><span class="line">  -&gt; 172.168.10.5:53              Masq    1      0          0         </span><br><span class="line">  -&gt; 172.168.10.6:53              Masq    1      0          0         </span><br><span class="line">TCP  10.96.0.10:9153 rr</span><br><span class="line">  -&gt; 172.168.10.5:9153            Masq    1      0          0         </span><br><span class="line">  -&gt; 172.168.10.6:9153            Masq    1      0          0         </span><br><span class="line">UDP  10.96.0.10:53 rr</span><br><span class="line">  -&gt; 172.168.10.5:53              Masq    1      0          0         </span><br><span class="line">  -&gt; 172.168.10.6:53              Masq    1      0          0</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Cluster 节点设置</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">oni@k8s-node-01:~$ sudo kubeadm join 10.10.2.10:6443 --token vf9okh.uwp98yrdzxowa980 \</span><br><span class="line">    --discovery-token-ca-cert-hash sha256:2d4da35dc030056d7a02d9634d74477d8c20698dab6b20e22fe0c7fec4298f33</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">oni@k8s-node-02:~$ sudo kubeadm join 10.10.2.10:6443 --token vf9okh.uwp98yrdzxowa980 \</span><br><span class="line">    --discovery-token-ca-cert-hash sha256:2d4da35dc030056d7a02d9634d74477d8c20698dab6b20e22fe0c7fec4298f33</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Master 查看节点</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">oni@k8s-master:~$ kubectl get node </span><br><span class="line">NAME          STATUS     ROLES    AGE   VERSION</span><br><span class="line">k8s-master    Ready      master   75m   v1.14.1</span><br><span class="line">k8s-node-01   NotReady   &lt;none&gt;   37s   v1.14.1</span><br><span class="line">k8s-node-02   NotReady   &lt;none&gt;   14s   v1.14.1</span><br><span class="line">oni@k8s-master:~$ kubectl get pods --all-namespaces -o wide</span><br><span class="line">NAMESPACE     NAME                                 READY   STATUS              RESTARTS   AGE     IP             NODE          NOMINATED NODE   READINESS GATES</span><br><span class="line">kube-system   coredns-fb8b8dccf-k7j74              1/1     Running             0          18m     172.168.10.8   k8s-master    &lt;none&gt;           &lt;none&gt;</span><br><span class="line">kube-system   coredns-fb8b8dccf-lxf6v              1/1     Running             0          18m     172.168.10.9   k8s-master    &lt;none&gt;           &lt;none&gt;</span><br><span class="line">kube-system   etcd-k8s-master                      1/1     Running             5          76m     10.10.2.10     k8s-master    &lt;none&gt;           &lt;none&gt;</span><br><span class="line">kube-system   kube-apiserver-k8s-master            1/1     Running             4          76m     10.10.2.10     k8s-master    &lt;none&gt;           &lt;none&gt;</span><br><span class="line">kube-system   kube-controller-manager-k8s-master   1/1     Running             4          76m     10.10.2.10     k8s-master    &lt;none&gt;           &lt;none&gt;</span><br><span class="line">kube-system   kube-flannel-ds-amd64-5l2mm          0/1     Init:0/1            0          2m27s   10.10.2.11     k8s-node-01   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">kube-system   kube-flannel-ds-amd64-8fqzz          0/1     Init:0/1            0          2m4s    10.10.2.12     k8s-node-02   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">kube-system   kube-flannel-ds-amd64-wkvcq          1/1     Running             0          64m     10.10.2.10     k8s-master    &lt;none&gt;           &lt;none&gt;</span><br><span class="line">kube-system   kube-proxy-2hbcf                     0/1     ContainerCreating   0          2m27s   10.10.2.11     k8s-node-01   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">kube-system   kube-proxy-st2tc                     0/1     ContainerCreating   0          2m4s    10.10.2.12     k8s-node-02   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">kube-system   kube-proxy-znkfb                     1/1     Running             0          77m     10.10.2.10     k8s-master    &lt;none&gt;           &lt;none&gt;</span><br><span class="line">kube-system   kube-scheduler-k8s-master            1/1     Running             4          76m     10.10.2.10     k8s-master    &lt;none&gt;           &lt;none&gt;</span><br></pre></td></tr></table></figure>
+
+<p><small>ContainerCreating / Init:0/1 容器会在创建完成后自动start 变成Running</small></p>
+<h6 id="安装完成"><a href="#安装完成" class="headerlink" title="安装完成"></a>安装完成</h6>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ubuntu18/" rel="tag"># ubuntu18</a>
+          
+            <a href="/tags/kubernetes/" rel="tag"># kubernetes</a>
+          
+            <a href="/tags/k8s/" rel="tag"># k8s</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Easeava</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#K8s安装本地测试环境"><span class="nav-number">1.</span> <span class="nav-text">K8s安装本地测试环境</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#k8s镜像因为墙的原因拉取不到-可以自己搭建镜像服务器或者使用第三方国内源"><span class="nav-number">1.0.0.0.0.1.</span> <span class="nav-text">k8s镜像因为墙的原因拉取不到, 可以自己搭建镜像服务器或者使用第三方国内源</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#安装完成"><span class="nav-number">1.0.0.0.0.2.</span> <span class="nav-text">安装完成</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Easeava</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
